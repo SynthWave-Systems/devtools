@@ -10,7 +10,7 @@ import {
     Statement,
     VariableStatement,
 } from 'typescript'
-import { createRetryFactory, createSimpleRetryStrategy, formatEid, OmniAddress } from '@layerzerolabs/devtools'
+import { formatEid, OmniAddress } from '@layerzerolabs/devtools'
 import { getEidForNetworkName } from '@layerzerolabs/devtools-evm-hardhat'
 import { getReceiveConfig, getSendConfig } from '@/utils/taskHelpers'
 import { Timeout, Uln302ExecutorConfig, Uln302UlnConfig } from '@layerzerolabs/protocol-devtools'
@@ -41,8 +41,6 @@ import {
     ULN_CONFIG,
     ZERO,
 } from '@/oapp/typescript/constants'
-
-const retryThreeTimes = createRetryFactory(createSimpleRetryStrategy<[string, string]>(3))
 
 /**
  * Normalizes the identifier name by replacing hyphens with underscores.
@@ -381,8 +379,8 @@ export const createDefaultConfig = async (fromNetwork: string, toNetwork: string
     let receiveDefaultConfig: [OmniAddress, Uln302UlnConfig, Timeout] | undefined
     try {
         ;[sendDefaultConfig, receiveDefaultConfig] = await Promise.all([
-            retryThreeTimes(getSendConfig)(fromNetwork, toNetwork),
-            retryThreeTimes(getReceiveConfig)(fromNetwork, toNetwork),
+            getSendConfig(fromNetwork, toNetwork),
+            getReceiveConfig(fromNetwork, toNetwork),
         ])
     } catch (error) {
         console.error('Failed to get send and receive default configs:', error)
